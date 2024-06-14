@@ -1,0 +1,28 @@
+1. Install Elasticsearch ( version 8.12.1, Feb 2024 release), Kibana ( version 8.12.1, Feb 2024 release), Logstash ( version 8.12.1, Feb 2024 release), and Kafka (as done in class).
+2. Install Python version 3.10 (since v3.12 was throwing errors for Kafka and other PySpark libraries).
+3. Start the zookeeper and broker services: https://kafka.apache.org/quickstart 
+4.Create 2 topics – topic1(stores the original data fetched from newsapi.org) and topic2 (contains the top 10 named entities extracted from the news article).
+	a. $ bin/kafka-topics.sh --create --topic topic1 --bootstrap-server localhost:9092
+    b. $ bin/kafka-topics.sh --create --topic topic2 --bootstrap-server localhost:9092
+5. Create 2 python files – PART1.py (for fetching news article from news api and sending the data to topic1) and PART2.py (for performing the word count of top 10 named entity and write the output to topic2).
+6. Run PART 1 and leave it running, it fetches new data from the NewsAPI: 
+	python3.10 <path_to_part1>/PART1.py
+
+7. Run PART2: go to Kafka directory –
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.1 <path_to_part2>/PART2.py localhost:9092 subscribe topic1
+
+8. If needed change the pyspark path: export PYSPARK_PATH = '/opt/homebrew/bin/python3.10’ (Add this path to ~/.bashrc file under kafka folder)
+
+9. See the results in topic2:
+	bin/kafka-console-consumer.sh --topic topic2 --from-beginning --bootstrap-server localhost:9092
+
+10. For Logstash, first create a config file and run it. (check the "apache-kafka.conf" file attached)
+	bin/logstash -f <path_to_apache-kafka.conf>/apache-kafka.conf
+
+11. Run the executable files under bin folder of Kibana and  Elastic Search 
+
+12. Go to https://localhost:9200 and login by giving username and password as shown in the config file. (Attached in the document)
+13. Navigate to Kibana dashboard http://localhost:5601/ and enter the token (follow the command as given on website).
+14. Create index pattern: logstash-*.
+15. Create a data view to visualize the word count of top 10 named entity (every 5 minutes).
+*Followed the link: https://shashanksrivastava.medium.com/monitor-apache-kafka-messages-using-elasticsearch-logstash-kibana-stack-e16bd89f85a6 for setup of Logstash, Kibana and Elastic Search.
